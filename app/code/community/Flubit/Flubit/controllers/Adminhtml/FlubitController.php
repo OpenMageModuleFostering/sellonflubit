@@ -47,6 +47,82 @@ class Flubit_Flubit_Adminhtml_FlubitController extends Mage_Adminhtml_Controller
         // We just forward the new action to a blank edit form
         $this->_forward('edit');
     }
+	
+		
+    public function generateProductXMLAction() {
+
+        $error = false;
+
+        try {
+
+            $result = Mage::getModel('flubit/flubit')->generateProductXML();
+
+            $message = $this->__($result);
+
+        } catch (Exception $e) {
+
+            $error = true;
+
+            $message = $this->__('%s', $e->getMessage());
+
+        }
+
+
+
+        if ($error) {
+
+            Mage::getSingleton('adminhtml/session')->addError($message);
+
+        } else {
+
+            Mage::getSingleton('adminhtml/session')->addSuccess($message);
+
+        }
+
+
+
+        $this->_redirect('adminhtml/system_config/edit');
+
+    }
+	
+	 public function smbIndexProductsAction() {
+
+        $error = false;
+
+        try {
+
+            $result = Mage::getModel('flubit/flubit')->smbIndexProducts();
+
+            $message = $this->__($result);
+
+        } catch (Exception $e) {
+
+            $error = true;
+
+            $message = $this->__('%s', $e->getMessage());
+
+        }
+
+
+
+        if ($error) {
+
+            Mage::getSingleton('adminhtml/session')->addError($message);
+
+        } else {
+
+            Mage::getSingleton('adminhtml/session')->addSuccess($message);
+
+        }
+
+
+
+        $this->_redirect('adminhtml/system_config/edit');
+
+    }
+
+
+	
 
     /**
      * Method for Render to Edit Action
@@ -91,6 +167,7 @@ class Flubit_Flubit_Adminhtml_FlubitController extends Mage_Adminhtml_Controller
             Mage::log(__LINE__ . 'Exception Flubit_Flubit_Adminhtml_FlubitController  editAction ' . $e, null, Flubit_Flubit_Helper_Data::FLUBIT_EXCEPTIONS);
         }
     }
+	
 
     /**
      * Method for Save Product Session Message

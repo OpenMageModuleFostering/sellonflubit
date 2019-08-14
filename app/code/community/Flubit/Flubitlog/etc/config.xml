@@ -10,7 +10,7 @@
 <config>
     <modules>
         <Flubit_Flubitlog>
-            <version>0.2.2</version>
+            <version>0.2.3</version>
         </Flubit_Flubitlog>
     </modules>
     <frontend>

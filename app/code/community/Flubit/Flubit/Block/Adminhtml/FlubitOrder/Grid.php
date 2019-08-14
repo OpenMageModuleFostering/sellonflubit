@@ -16,7 +16,7 @@
 
  */
 
-class Flubit_Flubit_Block_Adminhtml_Flubitorder_Grid extends Mage_Adminhtml_Block_Sales_Order_Grid {
+class Flubit_Flubit_Block_Adminhtml_FlubitOrder_Grid extends Mage_Adminhtml_Block_Widget_Grid {
 	
 	
 	     public function __construct()

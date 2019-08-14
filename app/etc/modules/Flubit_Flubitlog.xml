@@ -4,7 +4,7 @@
          <Flubit_Flubitlog>
              <active>true</active>
             <codePool>community</codePool>
-            <version>0.1.1</version>
+            <version>0.2.3</version>
         </Flubit_Flubitlog>
     </modules>
 </config>
