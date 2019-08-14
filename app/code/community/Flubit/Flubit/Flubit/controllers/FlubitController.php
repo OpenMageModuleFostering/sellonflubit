@@ -1,12 +1,19 @@
 <?php
 
 
+
 /**
+
  * Class Flubit Adminhtml Flubit
+
  * 
+
  * @package Flubit
+
  * @category Flubit_Flubit
+
  * @author Flubit team
+
  */
 
 class Flubit_Flubit_FlubitController extends Mage_Adminhtml_Controller_Action {
