@@ -93,13 +93,15 @@ class Flubit_Flubit_Block_Adminhtml_Flubit_Grid extends Mage_Adminhtml_Block_Wid
 			
 			// the above line has issues with multistore the below modification shoulñd be uncommented so it use default store
             //$collection->getSelect()->join(array('product_price' => Mage::getConfig()->getTablePrefix() . 'catalog_product_entity_decimal'), 'product_price.entity_id = product_entity.entity_id and product_price.store_id=0 and product_price.attribute_id = ' . $entity_id, array('mprice' => 'ROUND(product_price.`value`,2)'));
+			
+			// using joinLeft as older users might not have these attributes set
 
-            $collection->getSelect()->join(array('flubit1' => Mage::getConfig()->getTablePrefix() . 'catalog_product_entity_varchar'), 'flubit1.entity_id = product_entity.entity_id and flubit1.attribute_id = ' . $flubit_ean_attributeId, array('flubit_ean' => 'flubit1.value'));
-            $collection->getSelect()->join(array('flubit2' => Mage::getConfig()->getTablePrefix() . 'catalog_product_entity_varchar'), 'flubit2.entity_id = product_entity.entity_id and flubit2.attribute_id = ' . $flubit_upc_attributeId, array('flubit_upc' => 'flubit2.value'));
-            $collection->getSelect()->join(array('flubit3' => Mage::getConfig()->getTablePrefix() . 'catalog_product_entity_varchar'), 'flubit3.entity_id = product_entity.entity_id and flubit3.attribute_id = ' . $flubit_asin_attributeId, array('flubit_asin' => 'flubit3.value'));
-            $collection->getSelect()->join(array('flubit4' => Mage::getConfig()->getTablePrefix() . 'catalog_product_entity_varchar'), 'flubit4.entity_id = product_entity.entity_id and flubit4.attribute_id = ' . $flubit_isbn_attributeId, array('flubit_isbn' => 'flubit4.value'));
-            $collection->getSelect()->join(array('flubit5' => Mage::getConfig()->getTablePrefix() . 'catalog_product_entity_varchar'), 'flubit5.entity_id = product_entity.entity_id and flubit5.attribute_id = ' . $flubit_mpn_attributeId, array('flubit_mpn' => 'flubit5.value'));
-            $collection->getSelect()->join(array('flubit6' => Mage::getConfig()->getTablePrefix() . 'catalog_product_entity_varchar'), 'flubit6.entity_id = product_entity.entity_id and flubit6.attribute_id = ' . $flubit_brand_attributeId, array('flubit_brand' => 'flubit6.value'));
+            $collection->getSelect()->joinLeft(array('flubit1' => Mage::getConfig()->getTablePrefix() . 'catalog_product_entity_varchar'), 'flubit1.entity_id = product_entity.entity_id and flubit1.attribute_id = ' . $flubit_ean_attributeId, array('flubit_ean' => 'flubit1.value'));
+            $collection->getSelect()->joinLeft(array('flubit2' => Mage::getConfig()->getTablePrefix() . 'catalog_product_entity_varchar'), 'flubit2.entity_id = product_entity.entity_id and flubit2.attribute_id = ' . $flubit_upc_attributeId, array('flubit_upc' => 'flubit2.value'));
+            $collection->getSelect()->joinLeft(array('flubit3' => Mage::getConfig()->getTablePrefix() . 'catalog_product_entity_varchar'), 'flubit3.entity_id = product_entity.entity_id and flubit3.attribute_id = ' . $flubit_asin_attributeId, array('flubit_asin' => 'flubit3.value'));
+            $collection->getSelect()->joinLeft(array('flubit4' => Mage::getConfig()->getTablePrefix() . 'catalog_product_entity_varchar'), 'flubit4.entity_id = product_entity.entity_id and flubit4.attribute_id = ' . $flubit_isbn_attributeId, array('flubit_isbn' => 'flubit4.value'));
+            $collection->getSelect()->joinLeft(array('flubit5' => Mage::getConfig()->getTablePrefix() . 'catalog_product_entity_varchar'), 'flubit5.entity_id = product_entity.entity_id and flubit5.attribute_id = ' . $flubit_mpn_attributeId, array('flubit_mpn' => 'flubit5.value'));
+            $collection->getSelect()->joinLeft(array('flubit6' => Mage::getConfig()->getTablePrefix() . 'catalog_product_entity_varchar'), 'flubit6.entity_id = product_entity.entity_id and flubit6.attribute_id = ' . $flubit_brand_attributeId, array('flubit_brand' => 'flubit6.value'));
 			
 			if (count($flubit_custom_attributes) > 0) { // only if we have ids
 				foreach ($flubit_custom_attributes as $flubit_custom_attribute) {

@@ -115,9 +115,10 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
                         ->setNew($new)
                         ->save();
 						} else {
-						// we only want to update qty
+						// we only want to update qty and active status
                 		$flubit->setName($productName)
                         ->setQty($qty)
+						->setActiveStatus($status)
                         ->save();
 						}
 						
