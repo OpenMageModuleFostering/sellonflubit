@@ -167,7 +167,7 @@ If not the following functionalities will be affected.<br/>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <validate>required-entry validate-greater-than-zero</validate>
-                            <comment>The above two fields allow you to apply a global percentage discount or surcharge based on either store price, special price, cost price or RRP. </comment>
+                            <comment>The above two fields allow you to apply a global percentage discount or surcharge based on either store price or  cost price. </comment>
                         </global_price>
                         </fields>
                 </flubit_setup>                

@@ -7,7 +7,7 @@
  * @category Flubitlog_FlubitlogController
  * @author Flubit team
  */
-class Flubit_Flubitlog_Adminhtml_FlubitlogController extends Mage_Adminhtml_Controller_action {
+class Flubit_Flubitlog_Adminhtml_FlubitlogController extends Mage_Adminhtml_Controller_Action {
 	
 	/* @Method :        initAction Autoloader
      * @Parameter :    None 

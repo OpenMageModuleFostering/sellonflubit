@@ -192,7 +192,7 @@ class Flubit_Flubit_Adminhtml_FlubitController extends Mage_Adminhtml_Controller
                             $priceOfProduct = $product->getPrice($priceBasedOn); // get default magento price
                         }
 
-                        $flubitPrice = $priceOfProduct - ($priceOfProduct * ($globalPrice / 100));
+                        $flubitPrice = $priceOfProduct * $globalPrice;
                         $flubitPrice = number_format($flubitPrice, 2, '.', '');
                         //updating the price in the main table
                         if ($status == '1') {

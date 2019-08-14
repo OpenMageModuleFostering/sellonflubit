@@ -3,11 +3,11 @@
     "type": "magento-module",
     "license": "GPL",
     "homepage": "",
-    "description": "Sell on Flubit extension enables merchants to integrate with WeFlubit  API to sell on all Flubit Channels.",
+    "description": "Sell on Flubit extension enables merchants to integrate with WeFlubit  API to sell on all Flubit Channels",
     "authors": [
     {
-        "name": "Krishna Pallerla",
-        "email": "merchantintegrations@flubit.com"
+        "name": "Krishna",
+        "email": "merchantrelations@flubit.com"
     }
 ],
     "suggest": {

@@ -571,7 +571,7 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
                         $priceOfProduct = $product->getPrice($priceBasedOn); // get default magento price
                     }
 
-                    $flubitPrice = $priceOfProduct - ($priceOfProduct * ($globalPrice / 100));
+                    $flubitPrice = $priceOfProduct * $globalPrice;
                     $flubitPrice = number_format($flubitPrice, 2, '.', '');
 
                     if ($flubitPrice != $flubit->getPrice()) {
@@ -614,7 +614,7 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
                 else {
                     $priceBasedOn = $product->getPrice($priceBasedOn); // get default magento price
                 }
-                $flubitPrice = $priceBasedOn - ($priceBasedOn * ($globalPrice / 100));
+                $flubitPrice = $priceBasedOn * $globalPrice;
                 $flubitPrice = number_format($flubitPrice, 2, '.', '');
                 //$product->setFlubitBasePrice($flubitPrice)->save();
                 if ($flubitPriceUseGlobal == 0) {

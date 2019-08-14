@@ -18,9 +18,8 @@ class Flubit_Flubit_Model_Flubit_Price {
         return array(
             array('value' => "", 'label' => ''),
             array('value' => "price", 'label' => Mage::helper('adminhtml')->__('Price')),
-            array('value' => "special_price", 'label' => Mage::helper('adminhtml')->__('Special Price')),
             array('value' => "cost", 'label' => Mage::helper('adminhtml')->__('Cost')),
-            array('value' => "rrp", 'label' => Mage::helper('adminhtml')->__('RRP')),
+           
         );
     }
 
