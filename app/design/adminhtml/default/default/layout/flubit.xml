@@ -5,16 +5,16 @@
             <block type="flubit/adminhtml_notification" name="notification_flubit_cron" as="notification_flubit_cron" template="flubit/cronnotofocation.phtml"></block>
         </reference>
     </default>
-    <flubit_adminhtml_flubitbackend_index>
+    <adminhtml_flubitbackend_index>
         <reference name="content">
             <block type="flubit/adminhtml_flubitbackend" name="flubitbackend" template="flubit/flubitbackend.phtml"/>
         </reference>
-    </flubit_adminhtml_flubitbackend_index>
-    <flubit_adminhtml_flubit_index>
+    </adminhtml_flubitbackend_index>
+    <adminhtml_flubit_index>
         <reference name="content">
             <block type="flubit/adminhtml_flubit" name="flubit" />
         </reference>
-    </flubit_adminhtml_flubit_index>
+    </adminhtml_flubit_index>
     
     <adminhtml_sales_order_view>
         <reference name="order_info">
@@ -57,11 +57,11 @@
         </reference>
     </adminhtml_sales_order_invoice_view>
     
-    <flubit_adminhtml_flubit_index>
+    <adminhtml_flubit_index>
         <reference name="js">
             <block type="core/template" template="flubit/inline-edit.phtml" />
         </reference>
-    </flubit_adminhtml_flubit_index>
+    </adminhtml_flubit_index>
 	
 	<adminhtml_sales_order_shipment_new>
 	      <reference name="order_items">

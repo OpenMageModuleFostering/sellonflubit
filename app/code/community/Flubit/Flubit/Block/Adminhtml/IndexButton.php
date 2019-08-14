@@ -38,7 +38,7 @@ class Flubit_Flubit_Block_Adminhtml_IndexButton extends Mage_Adminhtml_Block_Sys
 
             $this->setElement($element);
 
-            $url = $this->getUrl('flubit/flubit/smbIndexProducts/');
+            $url = $this->getUrl('adminhtml/flubit/smbIndexProducts/');
 
 
 

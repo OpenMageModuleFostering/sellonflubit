@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Flubit_Flubit>
-            <version>0.3.4</version>
+            <version>0.3.5</version>
         </Flubit_Flubit>
     </modules>
     <frontend>
@@ -18,13 +18,13 @@
     </frontend>
     <admin>
         <routers>
-            <flubit>
-                <use>admin</use>
+            <adminhtml>
                 <args>
-                    <module>Flubit_Flubit</module>
-                    <frontName>flubit</frontName>
+                    <modules>
+                        <Flubit_Flubit before="Mage_Adminhtml">Flubit_Flubit_Adminhtml</Flubit_Flubit>
+                    </modules>
                 </args>
-            </flubit>
+            </adminhtml>
         </routers>
     </admin>
     <adminhtml>        
@@ -33,7 +33,7 @@
                 <children>
                     <flubit translate="title" module="flubit">
                         <title>Flubit Products</title>
-                        <action>flubit/adminhtml_flubit</action>
+                        <action>adminhtml/flubit</action>
                     </flubit>
                 </children>
             </catalog>

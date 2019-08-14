@@ -33,13 +33,13 @@
     </frontend>
     <admin>
         <routers>
-            <flubitlog>
-                <use>admin</use>
+            <adminhtml>
                 <args>
-                    <module>Flubit_Flubitlog</module>
-                    <frontName>flubitlog</frontName>
+                    <modules>
+                        <Flubit_Flubitlog before="Mage_Adminhtml">Flubit_Flubitlog_Adminhtml</Flubit_Flubitlog>
+                    </modules>
                 </args>
-            </flubitlog>
+            </adminhtml>
         </routers>
     </admin>
     <adminhtml>
@@ -51,7 +51,7 @@
                     <items module="flubitlog">
                         <title>View Logs</title>
                         <sort_order>0</sort_order>
-                        <action>flubitlog/adminhtml_flubitlog</action>
+                        <action>adminhtml/flubitlog</action>
                     </items>
                 </children>
             </flubitlog>
