@@ -1,6 +1,27 @@
-<?php $notice = $this->checkScheduledCronExecution(); ?>
-<?php if($notice): ?>
+<?php 
+
+$notice = $this->checkScheduledCronExecution();
+$failedOrders = $this->checkFailedOrders();
+
+
+ $goLog = $this->helper('flubit')->__('Click here to go to <a href="%s">the flubit Logs</a>.', $this->helper('adminhtml')->getUrl('flubitlog/adminhtml_flubitlog'));
+   
+
+ if($notice): ?>
 <div class="notification-global">
     <strong class="label">
     Latest Message:</strong> <?php echo $notice ?></div>
-<?php endif; ?>
+<?php endif; 
+
+
+if($failedOrders):?>
+<div class="notification-global">
+    <strong><?php echo $this->helper('flubit')->__('One or more Flubit Orders failed.') ?></strong>
+    <?php echo $goLog;?><?php foreach ($failedOrders as $failedOrder) { 
+	$logdetailUrl = $this->helper('adminhtml')->getUrl('flubitlog/adminhtml_flubitlog/detail', array('id'=>$failedOrder))
+	
+	?>
+    <br /><a href="<?php echo $logdetailUrl; ?>"><?php echo $this->helper('flubit')->__('Log id # :'); ?> <?php echo $failedOrder; ?></a>
+    <?php } ?>
+</div>
+<?php endif;?>

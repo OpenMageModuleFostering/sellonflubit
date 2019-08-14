@@ -79,10 +79,30 @@ If not the following functionalities will be affected.<br/>
                         </run>
                     </fields>
                 </flubit_configuration>
+                <flubit_grid translate="label"> 
+                    <label>Flubit Product grid</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>2</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <comment>Wish to extend the Flubit Product Grid?</comment>
+                    <fields>
+                        <product_grid_attributes translate="label">
+                            <label>Product Attributes</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Please enter upto two attribute codes seperated by a ,<br /> eg 'color,size'.<br />These columns will then be added to the flubit product grid to help you better filter them<br />Please note this will only work with attributes type dropdown/select]]></comment>
+                        </product_grid_attributes>
+                    </fields>
+                </flubit_grid>
                 <flubit_setup translate="label"> 
                     <label>Flubit Setup</label>
                     <frontend_type>text</frontend_type>
-                    <sort_order>2</sort_order>
+                    <sort_order>3</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>

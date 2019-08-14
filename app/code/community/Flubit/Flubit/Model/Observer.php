@@ -1,19 +1,11 @@
 <?php
 
-
-
 /**
-
  * Class Flubit Model Observer
-
  * 
-
  * @package Flubit
-
  * @category Flubit_Model
-
  * @author Flubit team
-
  */
 
 class Flubit_Flubit_Model_Observer {
@@ -21,13 +13,9 @@ class Flubit_Flubit_Model_Observer {
 
 
     /**
-
      * Method to observe save event of magento
-
      * 
-
      * @param Varien_Event_Observer $observer
-
      */
 
     public function saveOrderAfter(Varien_Event_Observer $observer) {
@@ -82,7 +70,7 @@ class Flubit_Flubit_Model_Observer {
 
             $product = $observer->getProduct();
 
-            $product->lockAttribute('flubit_base_price');
+            //$product->lockAttribute('flubit_base_price'); depreciated
 
         } catch (Exception $e) {
 
@@ -93,24 +81,16 @@ class Flubit_Flubit_Model_Observer {
     }
 
 
-
     /**
-
      * Method for Save Flubit Products
-
      * 
-
      * @param Varien_Event_Observer $observer
-
      * @return Boolean
-
      */
 
     public function saveFlubitProduct(Varien_Event_Observer $observer) {
 
         try {
-
-            //Mage::log('save run saveFlubitProduct', null, 'hum.txt');
 
             $product = $observer->getProduct();
 
@@ -125,47 +105,32 @@ class Flubit_Flubit_Model_Observer {
             if ($product->getFlubitProduct() == '1') {
 
 			$_product = Mage::getModel('catalog/product')->load($product->getId());
-
 			$status_stat = $_product->getStatus(); // check if the product is active or inactive in magento 
-
 			$stock = $_product->getStockItem();
-
 			$stock_status = $stock->getIsInStock();
+			$manualOveride = $flubit->getUserDisabled();
 
-			
 
 			$qtyStock = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product)->getQty();
 
-			
-
-					if (($status_stat == 1) && ($stock_status) && ($qtyStock > 0)) {
-
+					if (($status_stat == 1) && ($stock_status) && ($qtyStock > 0) && ($manualOveride < 1)) {
 						$status = 1;
-
 					} else {
-
 						$status = 0;
-
 					}
 
 			
 
                     $flubit->setName($product->getName())
-
                             ->setStatus('1')
-
                             ->setActiveStatus($status)
-
                             ->save();
 
                 } else {
 
                     $flubit->setName($product->getName())
-
                             ->setStatus('1')
-
                             ->setActiveStatus('0')
-
                             ->save();
 
                 }
@@ -194,23 +159,17 @@ class Flubit_Flubit_Model_Observer {
 
     }
 
-    
 
     /**
 
      * Method for Mass Update Flubit Products
-
      * 
-
      * @param Varien_Event_Observer $observer
-
      * @return Boolean
-
      */
 
     public function saveFlubitProductMassAttributeUpdate(Varien_Event_Observer $observer) {
 
-        //Mage::log($observer->getEvent()->getData(),null,'hum.log');
 
         $attribute_data = $observer->getAttributesData();
 
@@ -221,8 +180,6 @@ class Flubit_Flubit_Model_Observer {
 		
 
 		if (isset($attribute_data['flubit_product']))  {
-
-			//Mage::log('flubit_product',null,'hum.log');
 
 			$update_flubit_table = TRUE;
 
@@ -264,8 +221,6 @@ class Flubit_Flubit_Model_Observer {
 
 				}
 
-				//Mage::log($flubit_status . '--' . $product_id,null,'hum.log');
-
                 $flubitglobal = Mage::getModel('flubit/globalproduct');
 
                 $flubitglobal->setProductId($product_id)
@@ -290,20 +245,11 @@ class Flubit_Flubit_Model_Observer {
 
     }
 
-    
-
-
-
     /**
-
      * Method for Save Flubit Products
-
      * 
-
      * @param Xml String $product
-
      * @return array
-
      */
 
     private function _saveFlubitProductData($product) {
@@ -320,74 +266,49 @@ class Flubit_Flubit_Model_Observer {
 
             }
 
-            Mage::log('SKU : ' . $product->getSku() . ' ID '. $product->getId(), null, 'hum.log');
-
             $_product = Mage::getModel('catalog/product')->load($product->getId());
 
 			
 
             $status_stat = $_product->getStatus(); // check if the product is active or inactive in magento 
-
 			$stock = $_product->getStockItem();
-
 			$stock_status = $stock->getIsInStock();
-
-			
 
             $qty = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product)->getQty();//$flubitObj->getQty();
 
-				if (($status_stat == 1) && ($stock_status) && ($qty > 0)) {
-
+			$flubit = Mage::getModel('flubit/flubit')->load($product->getSku(), 'sku');
+			$manualOveride = $flubit->getUserDisabled();
+			
+				if (($status_stat == 1) && ($stock_status) && ($qty > 0) && ($manualOveride < 0)) {
 					$status = 1;
-
 				} else {
-
 					$status = 0;
-
 				}
 
-			$flubit = Mage::getModel('flubit/flubit')->load($product->getSku(), 'sku');
 
             $flubitObj = Mage::getModel('flubit/flubit');
-
-            //Mage::log(print_r($qty, TRUE), null, 'hum.txt');
-
-            //Mage::log('Quantity = ' . $qty, null, 'hum.txt');
 
             if ($flubit->getId() == '') {
 
                 $flubit = Mage::getModel('flubit/flubit');
 
                 $flubit->setName($product->getName())
-
                         ->setSku($product->getSku())
-
                         ->setPrice(0)
-
                         ->setQty($qty)
-
                         ->setStatus('1')
-
 						->setActiveStatus($status)
-
                         ->setNew('1')
-
                         ->save();
 
             } else {
 
                 $flubit->setName($product->getName())
-
                         ->setSku($product->getSku())
-
                         ->setPrice(0)
-
                         ->setQty($qty)
-
                         ->setStatus('1')
-
 						->setActiveStatus($status)
-
                         ->save();
 
             }
@@ -421,15 +342,10 @@ class Flubit_Flubit_Model_Observer {
 
 
     /**
-
      * Method for Check Ean, Asin, Isbn, Mpn
-
      * 
-
      * @param string $pr
-
      * @return boolean
-
      */
 
     private function checkEanValidation($pr) {
@@ -656,11 +572,7 @@ class Flubit_Flubit_Model_Observer {
 
             $data = $config->inactiveProduct($product_sku, 0);
 
-			//Mage::log($data . '------',null,'hum.log');
-
 			$xml = $config->getproductFeedStatus($data,'xml');
-
-			//Mage::log($xml . '+++++++',null,'hum.log');
 
             if (!isset($xml)) {
 
@@ -682,9 +594,6 @@ class Flubit_Flubit_Model_Observer {
 
     }
 
-
-
-	
 
     /**
 
@@ -796,6 +705,27 @@ class Flubit_Flubit_Model_Observer {
 
         
 
+    }
+
+ public function beforeBlockToHtml(Varien_Event_Observer $observer)
+    {
+        $grid = $observer->getBlock();
+
+        /**
+         * Mage_Adminhtml_Block_Customer_Grid
+         */
+        if ($grid instanceof Mage_Adminhtml_Block_Sales_Order_Grid) {
+            $grid->addColumnAfter(
+                'flubit_order_id',
+                array(
+                    'header' => Mage::helper('flubit')->__('Flubit Order ID'),
+                	'width' => '50px',
+                	'type'  => 'number',
+                    'index'  => 'flubit_order_id'
+                ),
+                'real_order_id'
+            );
+        }
     }
 
     

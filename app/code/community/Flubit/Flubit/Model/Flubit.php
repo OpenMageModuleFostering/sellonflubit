@@ -39,7 +39,7 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
 		
 			$flubit = Mage::getModel('flubit/flubit')->load($sku, 'sku');
             if ($flubit->getId() == '') { } else { // only delete items that exist!
-						Mage::log($sku.' was deleted' , null, 'flubit_smb.txt');
+						//Mage::log($sku.' was deleted' , null, 'flubit_smb.txt');
             $flubit ->setIsDeleted('1')
                     ->save();
 		
@@ -62,7 +62,7 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
 		$returnString ='';
         
 			
-		Mage::log('started' , null, 'flubit_smb.txt');
+		//Mage::log('started' , null, 'flubit_smb.txt');
 		
 		// we only really need entity_id
 		$myCollection = Mage::getModel('catalog/product')
@@ -78,11 +78,15 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
 				$stock_status = $product->getStockItem()->getIsInStock();
 				$sku = $product->getSku();
 				$productName = $product->getName();
+				
             	$qty = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product)->getQty();
-
-				if (($status_stat == 1) && ($stock_status) && ($qty > 0)) {$status = 1;} else {$status = 0;}
 				
 				$flubit = Mage::getModel('flubit/flubit')->load($sku,'sku');
+				$manualOveride = $flubit->getUserDisabled();
+				
+				if (($status_stat == 1) && ($stock_status) && ($qty > 0) && ($manualOveride<1)) {$status = 1;} else {$status = 0;}
+				
+				
             	$flubitObj = Mage::getModel('flubit/flubit');
 				
                 if ($product->getFlubitProduct() != '1') { // not a flubit product
@@ -115,9 +119,18 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
                 		$flubit->setName($productName)
                         ->setQty($qty)
                         ->save();
-							
 						}
-					// update flubit price unsure why its not above		
+						
+						// update - use field set product as new from to determine available_from
+						/*$productAvailableFrom = $product->getNewsFromDate();
+						$available_date = new DateTime($productAvailableFrom);
+						$current_date = new DateTime();
+						
+						if ($available_date > $current_date) { // if the date is in the future
+                		$flubit->setAvailableFrom($productAvailableFrom)
+                        ->save();
+						} */
+						// update flubit price unsure why its not above		
 					try {
             			if (is_object($flubit)) {
                 			$flubitPrice = (number_format($flubitObj->getFlubitPrice($product), 2, '.', ''));
@@ -140,7 +153,7 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
         }
 			
 		
-		Mage::log('finished' , null, 'flubit_smb.txt');
+		//Mage::log('finished' , null, 'flubit_smb.txt');
 		$returnString ='Products Successfully reindexed';
         return $returnString;
 	}
@@ -221,7 +234,6 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
      * Method to delete log files and flubitlog table
      */
     public function archiveLog() {
-        //Mage::log('archive',null,'hum.log');
 		//$olderthen = Mage::getStoreConfig(self::LOGDATE_OLDER);
         $logbefore = date('Y-m-d h:i:s', strtotime('-' . 30 . ' day'));
         $flubitlogs = Mage::getModel('flubitlog/flubitlog')->getCollection();
@@ -278,22 +290,22 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
                     $updateXML = '';
 
 					
-                    foreach ($flubit_products as $flubit_Prodcut) {
+                    foreach ($flubit_products as $flubit_Product) {
                         // get magento product id for the given sku 
-                        if ($flubit_Prodcut->getSku() == '') { // we cannot proceed further if sku is missing
+                        if ($flubit_Product->getSku() == '') { // we cannot proceed further if sku is missing
                             Mage::log('Missing SKU for flubit product ', NULL, Flubit_Flubit_Helper_Data::FLUBIT_CREATE_PRODUCT);
                             // save the status to zero so that its called next time only once its updated from backend
-                            $flubit_Prodcut->setStatus('0')
+                            $flubit_Product->setStatus('0')
                                     ->save();
                             continue;
                         }
-                        $product_id = Mage::getModel('catalog/product')->getIdBySku(trim($flubit_Prodcut->getSku()));
+                        $product_id = Mage::getModel('catalog/product')->getIdBySku(trim($flubit_Product->getSku()));
                         $product = Mage::getModel('catalog/product')->load($product_id);
 
                         // check if the prodcut exist in magento 
                         if (!$product->getId()) {
-                            Mage::log('Sku ' . $product->getSku() . ' does not found in Magento.', null, Flubit_Flubit_Helper_Data::FLUBIT_FAILED_PRODUCT);
-                            $flubit_Prodcut->setStatus('0')
+                            Mage::log('Sku ' . $product->getSku() . ' was not found in Magento.', null, Flubit_Flubit_Helper_Data::FLUBIT_FAILED_PRODUCT);
+                            $flubit_Product->setStatus('0')
                                     ->save();
                             continue;
                         }
@@ -314,7 +326,7 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
 
                                 Mage::log($product->getSku() . ' missing identifiers', null, Flubit_Flubit_Helper_Data::FLUBIT_FAILED_PRODUCT);
                                 // save the status to zero so that its called next time only once its updated from backend
-                                $flubit_Prodcut->setStatus('0')
+                                $flubit_Product->setStatus('0')
                                         ->save();
                             } else {
                                 Mage::log('Product was deleted from Magento SKU :' . $product->getSku(), null, Flubit_Flubit_Helper_Data::FLUBIT_FAILED_PRODUCT);
@@ -336,7 +348,7 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
                             Mage::log($product->getSku() . ' Image is not available. please update and send again.', null, Flubit_Flubit_Helper_Data::FLUBIT_FAILED_PRODUCT);
                             //the product has not been pushed and so should be treated as new
                             // save the status to zero so that its called next time only once its updated from backend
-                            $flubit_Prodcut->setStatus('0')
+                            $flubit_Product->setStatus('0')
                                     ->save();
                             continue;
                         }
@@ -345,8 +357,9 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
                         $flubit_stat = $product->getFlubitProduct(); // if product flubit stat is true
                         $status_stat = $product->getStatus(); // check if the product is active or inactive in magento 
                         $stock = $product->getStockItem();
-                        //Mage::log($stock->getData(), null, 'test.log');
                         $stock_status = $stock->getIsInStock();
+						$manualOveride = $flubit_Product->getUserDisabled();
+					
 
                         $qtyStock = 0;
                         try {
@@ -369,23 +382,23 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
                             $this->logFlubitProductsRequestResponse('', $response, 'Create Product', $feedid);
 
                             Mage::log('quantity is in decimal = ' . $qtyStock, null, 'flubit_create_product.log');
-                            $flubit_Prodcut->setStatus('0')
+                            $flubit_Product->setStatus('0')
                                     ->save();
                             continue;
                         }
 
-                        if (($flubit_stat == 1) && ($status_stat == 1) && ($stock_status) && ($qtyStock > 0)) {
+                        if (($flubit_stat == 1) && ($status_stat == 1) && ($stock_status) && ($qtyStock > 0) && ($manualOveride < 1)) { // maybe we should make this a function
                             $status = 'true';
                         } else {
                             $status = 'false';
                         }
 
-                        if ($flubit_Prodcut->getNew() == '1') {
+                        if ($flubit_Product->getNew() == '1') {
                             if ($product->getSku() != '') { // check if prodcut SKU is not null
                                 $newXML .= '<product sku="' . $product->getSku() . '">';
                                 $newXML .= '<title><![CDATA[' . $product->getName() . ']]></title>';
                                 $newXML .= "<is_active>$status</is_active>";
-                                $newXML .= '<base_price>' . (number_format($flubit_Prodcut->getPrice(), 2, '.', '')) . '</base_price>';
+                                $newXML .= '<base_price>' . (number_format($flubit_Product->getPrice(), 2, '.', '')) . '</base_price>';
                                 $newXML .= '<stock>' . number_format((int) $qtyStock, 0, '.', '') . '</stock>';
                                 $newXML .= '<description><![CDATA[' . $this->removeNonUtfCharacters($product->getDescription()) . ']]></description>';
 
@@ -395,7 +408,7 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
                                     $newXML .= '<image><![CDATA[' . $image_path . ']]></image>';
                                     $newXML .= '   </images>';
                                 }
-                                if ($product->getFlubitEan() || $product->getFlubitAsin() || $product->getFlubitIsbn() || $product->getFlubitMpn()) {
+                                if ($product->getFlubitEan() || $product->getFlubitAsin() || $product->getFlubitIsbn() || $product->getFlubitMpn() || $product->getFlubitUpc()) {
                                     $newXML .= '<identifiers>';
                                     if ($product->getFlubitEan())
                                         $newXML .= '<identifier type="EAN">' . $product->getFlubitEan() . '</identifier>';
@@ -405,6 +418,8 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
                                         $newXML .= '<identifier type="ISBN">' . $product->getFlubitIsbn() . '</identifier>';
                                     if ($product->getFlubitMpn())
                                         $newXML .= '<identifier type="MPN">' . $product->getFlubitMpn() . '</identifier>';
+                                    if ($product->getFlubitUpc())
+                                        $newXML .= '<identifier type="UPC">' . $product->getFlubitUpc() . '</identifier>';
                                     $newXML .= '</identifiers>';
                                 }
                                 if ($product->getFlubitBrand())
@@ -416,7 +431,16 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
                                     if ($product->getFlubitExpressDelivery())
                                         $newXML .= '<express>' . number_format($product->getFlubitExpressDelivery(), 2, '.', '') . '</express>';
                                     $newXML .= '</delivery_cost>';
-                                }
+                                }	
+								// available from mod
+								$productAvailableFrom = $product->getNewsFromDate();
+								$availableFromDate = new DateTime($productAvailableFrom);
+								$current_date = new DateTime();
+
+								if ($availableFromDate > $current_date)
+									{
+                                    $newXML .= '<available_from>' . date('c',strtotime($productAvailableFrom)) . '</available_from>';
+									}
                                 if ($product->getWeight())
                                     $newXML .= '<weight>' . number_format($product->getWeight(), 1, '.', '') . '</weight>';
                                 if ($percent)
@@ -426,8 +450,17 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
                         } else {
                             $updateXML .= '<product sku="' . $product->getSku() . '">';
                             $updateXML .= "<is_active>$status</is_active>";
-                            $updateXML .= '<base_price>' . (number_format($flubit_Prodcut->getPrice(), 2, '.', '')) . '</base_price>';
+                            $updateXML .= '<base_price>' . (number_format($flubit_Product->getPrice(), 2, '.', '')) . '</base_price>';
                             $updateXML .= '<stock>' . number_format($qtyStock, 0, '.', '') . '</stock>';
+								// available from mod
+								$productAvailableFrom = $product->getNewsFromDate();
+								$availableFromDate = new DateTime($productAvailableFrom);
+								$current_date = new DateTime();
+
+								if ($availableFromDate > $current_date)
+									{
+                                    $newXML .= '<available_from>' . date('Y-m-d H:i:s',strtotime($productAvailableFrom)) . '</available_from>';
+									}
                             $updateXML .= '</product>';
                         }
 
@@ -437,9 +470,9 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
                             $flubitActiveStatus = '0';
                             if ($status == 'true')
                                 $flubitActiveStatus = '1';
-                            if ($flubit_Prodcut->getActiveStatus() != $flubitActiveStatus) {
-                                //$flubit_Prodcut->setData(array('flubit_id' => $flubit_Prodcut->getId(), 'active_status' => $flubitActiveStatus))
-                                $flubit_Prodcut->setActiveStatus($flubitActiveStatus)
+                            if ($flubit_Product->getActiveStatus() != $flubitActiveStatus) {
+                                //$flubit_Product->setData(array('flubit_id' => $flubit_Product->getId(), 'active_status' => $flubitActiveStatus))
+                                $flubit_Product->setActiveStatus($flubitActiveStatus)
                                         ->save();
                             }
                         } catch (Exception $e) {
@@ -505,7 +538,7 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
                     if ($create_feed_prodcut_xml != '') { // if create product feed is not null send to flubit
                         $create_result = $config->createFlubitProducts($create_feed_prodcut_xml);
                         if ($create_result != '') {
-                            Mage::log($create_result, NULL, 'createfeed.log');
+                            //Mage::log($create_result, NULL, 'createfeed.log');
                             if (is_object($create_result)) {
                                 if ($create_result->getName() == 'id') {
                                     $this->feedLog($create_result, 'Create');
@@ -537,7 +570,7 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
                     if ($update_feed_prodcut_xml != '') { // if create product feed is not null send to flubit
                         $update_result = $config->updateFlubitProducts($update_feed_prodcut_xml);
                         if ($update_result != '') {
-                            Mage::log(print_r($update_result, true), NULL, 'updatefeed.log');
+                            //Mage::log(print_r($update_result, true), NULL, 'updatefeed.log');
                             if (is_object($update_result)) {
                                 if ($update_result->getName() == 'id') {
                                     $this->feedLog($update_result, 'update');
@@ -667,7 +700,6 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
      * @return int
      */
     public function updateFlubitPrice() {
-        //Mage::log('price',null,'hum.log');
 		try {
             $priceBasedOn = Mage::getStoreConfig('flubit_section/flubit_setup/price_based_on');
             $globalPrice = Mage::getStoreConfig('flubit_section/flubit_setup/global_price');
@@ -679,7 +711,6 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
                     ->addFieldToSelect('price')
                     ->setOrder('flubit_id', 'DESC')
                     ->setPageSize('200');
-            //Mage::log($flubitCollection->getData(), null, 'hum.log');
             foreach ($flubitCollection as $flubit) {
                 $product = Mage::getModel('catalog/product')->loadByAttribute('sku', $flubit->getSku());
                 if (is_object($product)) {
@@ -813,7 +844,7 @@ class Flubit_Flubit_Model_Flubit extends Mage_Core_Model_Abstract {
     public function checkEanValidation($pr) {
         try {
             if (is_object($pr)) {
-                if ($pr->getFlubitEan() || $pr->getFlubitAsin() || $pr->getFlubitIsbn() || $pr->getFlubitMpn()) {
+                if ($pr->getFlubitEan() || $pr->getFlubitAsin() || $pr->getFlubitIsbn() || $pr->getFlubitMpn() || $pr->getFlubitUpc()) {
                     return true;
                 }
             }

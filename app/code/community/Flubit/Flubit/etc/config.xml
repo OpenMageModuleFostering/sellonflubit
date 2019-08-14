@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Flubit_Flubit>
-            <version>0.3.1</version>
+            <version>0.3.3</version>
         </Flubit_Flubit>
     </modules>
     <frontend>
@@ -60,6 +60,16 @@
                 </flubit>
             </updates>
         </layout>
+		<events>
+        	<core_block_abstract_to_html_before>
+            	<observers>
+                	<core_block_abstract_to_html_before_flubit_handler>
+                    	<class>Flubit_Flubit_Model_Observer</class>
+                    	<method>beforeBlockToHtml</method>
+                	</core_block_abstract_to_html_before_flubit_handler>
+            	</observers>
+        	</core_block_abstract_to_html_before>
+    	</events>
     </adminhtml>
     <global>        
         <models>

@@ -122,6 +122,233 @@ class Flubit_Flubit_Adminhtml_FlubitController extends Mage_Adminhtml_Controller
             Mage::log(__LINE__ . 'Exception Flubit_Flubit_Adminhtml_FlubitController  saveAction ' . $e, null, Flubit_Flubit_Helper_Data::FLUBIT_EXCEPTIONS);
         }
     }
+	
+	/** 0.3.2 **/
+	public function massactionAction() {
+		$flubitIds = $this->getRequest()->getParam('flubit_id');
+		$statusAction = $this->getRequest()->getParam('status');
+		$priceAction = $this->getRequest()->getParam('price');
+		$priceIncreaseFixedAction = $this->getRequest()->getParam('priceIncreaseFixed');
+		$priceIncreaseAction = $this->getRequest()->getParam('priceIncrease');
+		$priceIncreaseCentAction = $this->getRequest()->getParam('priceIncreaseCent');
+		$priceDecreaseAction = $this->getRequest()->getParam('priceDecrease');
+		$priceDecreaseCentAction = $this->getRequest()->getParam('priceDecreaseCent');
+		
+		if (isset($statusAction)) {
+		$message = $this -> updateMassStatusAction ($flubitIds,$statusAction);
+		}
+		if (isset($priceAction)) {
+		$message = $this -> updateMassPriceAction ($flubitIds,$priceAction);
+		}
+		if (isset($priceIncreaseFixedAction)) {
+		$message = $this -> updateMassPriceChangeAction ('fixedIncrease',$flubitIds,$priceIncreaseFixedAction);
+		}
+		if (isset($priceIncreaseAction)) {
+		$message = $this -> updateMassPriceChangeAction ('priceIncrease',$flubitIds,$priceIncreaseAction);
+		}
+		if (isset($priceIncreaseCentAction)) {
+		$message = $this -> updateMassPriceChangeAction ('percentIncrease',$flubitIds,$priceIncreaseCentAction);
+		}
+		if (isset($priceDecreaseAction)) {
+		$message = $this -> updateMassPriceChangeAction ('priceDecrease',$flubitIds,$priceDecreaseAction);
+		}
+		if (isset($priceDecreaseCentAction)) {
+		$message = $this -> updateMassPriceChangeAction ('percentDecrease',$flubitIds,$priceDecreaseCentAction);
+		}
+		
+		$this->_getSession()->addSuccess($message);
+		
+		$this->_redirect('*/*/index');
+	}
+	
+	public function updateMassStatusAction ($flubitIds,$statusAction) {
+		 	if ($flubitIds) {
+				foreach ($flubitIds as $flubitId) {
+                	$collection = Mage::getModel('flubit/flubit')->getCollection();
+                	$collection->addFieldToFilter('flubit_id', $flubitId)
+                        ->addFieldToSelect('sku')
+                        ->addFieldToSelect('flubit_id');	
+                	foreach ($collection as $flubit) {
+						
+					switch ($statusAction) {
+					case 'inactive':
+						$UserDisabled = 1;
+						$ActiveStatus = 0;
+					break;
+					default : // inactive price calculation
+						$UserDisabled = 0;	
+						$ActiveStatus = 1;	
+					break;
+					}
+                    $sku = $flubit->getSku();
+                    $flubit			->setUserDisabled($UserDisabled)
+									->setActiveStatus($ActiveStatus)
+                                    ->setStatus('1')
+                            		->save();
+					
+              		$message .= Mage::helper('adminhtml')->__('Flubit Set '.$statusAction.' for "%s" <br>', $flubit->getSku());	
+					}
+				}
+				return $message;
+			 }
+	}
+	
+
+	public function updateMassPriceAction ($flubitIds,$priceAction) {
+		
+            $priceBasedOn = Mage::getStoreConfig('flubit_section/flubit_setup/price_based_on');
+            $globalPrice = Mage::getStoreConfig('flubit_section/flubit_setup/global_price');
+		
+            if ($flubitIds) {
+				foreach ($flubitIds as $flubitId) {
+                	$collection = Mage::getModel('flubit/flubit')->getCollection();
+                	$collection->addFieldToFilter('flubit_id', $flubitId)
+                        ->addFieldToSelect('sku')
+                        ->addFieldToSelect('flubit_id')
+                        ->addFieldToSelect('price');	
+                	foreach ($collection as $flubit) {
+					$product = Mage::getModel('catalog/product')->loadByAttribute('sku', $flubit->getSku());
+                    if (is_object($product)) {
+                        if ($priceBasedOn) {
+                            $priceOfProduct = $product->getData($priceBasedOn); // Get price based on selected price
+                        } else {
+                            $priceOfProduct = $product->getPrice($priceBasedOn); // get default magento price
+                        }
+
+					switch ($priceAction) {
+					case 'manual':
+						$priceActionChoice = 0;
+						$flubitPrice =  $flubit->getPrice();
+					break;
+					default : // global price calculation
+						$priceActionChoice = 1;	
+                        $flubitPrice = $priceOfProduct * $globalPrice;
+                        $flubitPrice = number_format($flubitPrice, 2, '.', '');
+					break;
+					}
+                    $sku = $flubit->getSku();
+                    $flubit			->setPrice($flubitPrice)
+									->setUseGlobalPrice($priceActionChoice)
+                                    ->setGlobalPriceUpdate('1')
+                            		->save();
+              		$message .= Mage::helper('adminhtml')->__('Flubit Price overriden for "%s" <br>', $flubit->getSku());
+                	}
+					
+					}
+				}
+				return $message;
+			}
+		
+	}
+	
+	
+	public function updateMassPriceChangeAction($method,$flubitIds,$value) {
+			// lets tidy the user input
+			$value =  str_replace('%','', trim($value));
+			$value =  str_replace('$','', trim($value));
+			$value =  str_replace('€','', trim($value));
+			$value =  str_replace('£','', trim($value));
+		
+            $priceBasedOn = Mage::getStoreConfig('flubit_section/flubit_setup/price_based_on');
+            $globalPrice = Mage::getStoreConfig('flubit_section/flubit_setup/global_price');
+            if ($flubitIds) {
+				foreach ($flubitIds as $flubitId) {
+					
+                	$collection = Mage::getModel('flubit/flubit')->getCollection();
+                	$collection->addFieldToFilter('flubit_id', $flubitId)
+                        ->addFieldToSelect('sku')
+                        ->addFieldToSelect('flubit_id')
+                        ->addFieldToSelect('price');	
+                	foreach ($collection as $flubit) {
+						
+					$product = Mage::getModel('catalog/product')->loadByAttribute('sku', $flubit->getSku());
+                    if (is_object($product)) {
+                        if ($priceBasedOn) {
+                            $priceOfProduct = $product->getData($priceBasedOn); // Get price based on selected price
+                        } else {
+                            $priceOfProduct = $product->getPrice($priceBasedOn); // get default magento price
+                        }
+					
+						$flubitPrice =  $flubit->getPrice();
+						$priceActionChoice = 0; // manual price
+					switch ($method) {
+					case 'fixedIncrease':
+						// we are passinbg a fixed price
+                        $flubitPrice = number_format($value, 2, '.', '');
+						
+					break;
+					case 'priceIncrease':
+						
+                        $flubitPrice = $priceOfProduct + $value;
+                        $flubitPrice = number_format($flubitPrice, 2, '.', '');
+						
+					break;
+					case 'percentIncrease':
+						if ($value > 1) { // assume customer passed a % eg 20%
+							$value = $value / 100;
+						}
+                        $flubitPrice = $priceOfProduct * (1 + $value);
+                        $flubitPrice = number_format($flubitPrice, 2, '.', '');
+						
+					break;
+					case 'priceDecrease':
+						
+                        $flubitPrice = $priceOfProduct - $value;
+                        $flubitPrice = number_format($flubitPrice, 2, '.', '');
+						
+					break;
+					case 'percentDecrease':
+						
+						if ($value > 1) { // assume customer passed a % eg 25%
+							$value = $value / 100;
+						}
+                        $flubitPrice = $priceOfProduct * (1 - $value);  // 25% decrease  = 75% product price = 0.75
+                        $flubitPrice = number_format($flubitPrice, 2, '.', '');
+						
+					break;
+					default : // default global price calculation
+						$priceActionChoice = 1;	
+                        $flubitPrice = $priceOfProduct * $globalPrice;
+                        $flubitPrice = number_format($flubitPrice, 2, '.', '');
+					break;
+						
+					}
+					
+					
+                    $flubit			->setPrice($flubitPrice)
+									->setUseGlobalPrice($priceActionChoice)
+                                    ->setGlobalPriceUpdate('1')
+                            		->save();
+              		$message .= Mage::helper('adminhtml')->__('Flubit Price overriden for "%s" <br>', $flubit->getSku());
+					}
+					}
+				}
+				return $message;
+			}
+		
+		
+	}
+	
+	
+	
+	public function exportCsvAction()
+			{
+			$fileName = 'flubit.csv';
+			$content = $this->getLayout()
+				->createBlock('flubit/adminhtml_flubit_grid')
+				->getCsv();
+			$this->_prepareDownloadResponse($fileName, $content);
+			}
+
+	public function exportXmlAction()
+			{
+			$fileName = 'flubit.xml';
+			$content = $this->getLayout()
+				->createBlock('flubit/adminhtml_flubit_grid')
+				->getXml();
+			$this->_prepareDownloadResponse($fileName, $content);
+			}
+	
 
     /**
      * Method for Update Flubit Price
