@@ -1,0 +1,177 @@
+<?xml version="1.0"?>
+<config>
+    <tabs>
+        <flubit_tab translate="label" module="flubit">
+            <!--<label>flubit</label>-->
+            <label><![CDATA[<div style="position: absolute;"><img id="flubit_logo" src="" alt="" border="0" /></div>&nbsp;<script>$('flubit_logo').src = SKIN_URL + "images/flubit/logo.png";</script>]]></label>
+            <sort_order>0</sort_order>
+        </flubit_tab>
+    </tabs>
+    <sections>
+        <flubit_section translate="label" module="flubit">                    
+            <label>Flubit</label>
+            <tab>flubit_tab</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>0</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store> 
+            <groups>
+                <flubit_configuration translate="label"> 
+                    <label>Flubit Configuration</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>1</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <comment><![CDATA[<span style="color:#2a6994;">
+<strong style="color:#00AEED;">Disclaimer:</strong><br/>
+In order for the extension to run please ensure that Crons/Scheduled Tasks are set up and executing on your hosted environment.<br/><br/>
+If not the following functionalities will be affected.<br/>
+<ul>
+<li>1. Product Creation and Updates to the Flubit Channel.</li>
+<li>2. Fetching Orders from Flubit.</li>
+<li>3. Order Status Updates being sent to Flubit.</li>
+
+</ul><br/>
+<span style="color:#000;">Fields with * are Mandatory.</span>
+</span><br/>
+<br/>                               
+]]></comment>           
+                    <fields>
+                        <flubit_consumer_key translate="label">
+                            <label>Consumer Key*</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <validate>required-entry</validate>
+                            <comment>Please enter your personal consumer key provided by Flubit.</comment>
+                        </flubit_consumer_key>
+                        <flubit_secret translate="label">
+                            <label>Secret*</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <validate>required-entry</validate>
+                            <comment>Please enter your personal secret key provided by Flubit.</comment>
+                        </flubit_secret>
+                        <flubit_url translate="label">
+                            <label>URL*</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <validate>required-entry</validate>
+                            <comment>Please enter the API URL</comment>
+                        </flubit_url>
+                        <run translate="label">
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>Flubit_Flubit_Block_Adminhtml_Button</frontend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </run>
+                    </fields>
+                </flubit_configuration>
+                <flubit_setup translate="label"> 
+                    <label>Flubit Setup</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>2</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <product_cron_settings translate="label">
+                            <label>Product Update Frequency</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>flubit/flubit_source</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>How often do you want the cron to run?</comment>
+                        </product_cron_settings>
+                        <order_cron_settings translate="label">
+                            <label>Order Fetch Freqency</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>flubit/flubit_order</source_model>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>How often do you want the cron to run?</comment>
+                        </order_cron_settings>
+                        <order_dispatch_cron_settings translate="label">
+                            <label>Dispatch Order Freqency</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>flubit/flubit_rcd</source_model>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>How often do you want the cron to run?</comment>
+                        </order_dispatch_cron_settings>
+                        <order_cancel_cron_settings translate="label">
+                            <label>Cancel Order Freqency</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>flubit/flubit_rcd</source_model>
+                            <sort_order>4</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>How often do you want the cron to run?</comment>
+                        </order_cancel_cron_settings>
+                        <order_refund_cron_settings translate="label">
+                            <label>Refund Order Freqency</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>flubit/flubit_rcd</source_model>
+                            <sort_order>5</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>How often do you want the cron to run?</comment>
+                        </order_refund_cron_settings>
+                        <flubit_chunk translate="label">
+                            <label>Product Chunk Size</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>flubit/flubit_chunk</source_model>
+                            <sort_order>9</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <validate>required-entry validate-greater-than-zero</validate>
+                            <comment>Please select the maximum number of records you would like to push per request.</comment>
+                        </flubit_chunk>
+                        <price_based_on translate="label">
+                            <label>FBP based On:*</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>flubit/flubit_price</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <validate>required-entry</validate>
+                            <comment></comment>
+                        </price_based_on>
+                        <global_price translate="label">
+                            <label>Percentage Calculation:(%)*</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>11</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <validate>required-entry validate-greater-than-zero</validate>
+                            <comment>The above two fields allow you to apply a global percentage discount or surcharge based on either store price, special price, cost price or RRP. </comment>
+                        </global_price>
+                        </fields>
+                </flubit_setup>                
+            </groups>
+        </flubit_section>
+    </sections>
+</config>

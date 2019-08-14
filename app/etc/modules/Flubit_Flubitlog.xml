@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+         <Flubit_Flubitlog>
+             <active>true</active>
+            <codePool>community</codePool>
+            <version>0.1.0</version>
+        </Flubit_Flubitlog>
+    </modules>
+</config>

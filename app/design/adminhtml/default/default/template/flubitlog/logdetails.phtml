@@ -1,0 +1,275 @@
+<?php
+//details page to be displayed from here
+
+$data = Mage::registry('flubitlog_data')->getData();
+/*
+  echo '<pre>';
+  echo print_r($data,true);
+  echo '</pre>';
+  $xml = simplexml_load_string($data['request_xml']);
+
+  echo '<pre>';
+  echo '<textarea width="100%">' . $xml->asXML() . '</textarea>';
+
+  echo '</pre>'; */
+?>
+
+<div class="content-header">
+    <table cellspacing="0">
+        <tr>
+            <td style="<?php echo $this->getHeaderWidth() ?>"><?php //echo $this->getHeaderHtml()  ?>Log Details</td>
+            <td class="form-buttons"><?php //echo $this->getButtonsHtml()  ?>
+                <p class="content-buttons form-buttons">
+                    <button id="" title="Back" type="button" class="scalable back" 
+                            onclick="setLocation('<?php echo Mage::app()->getRequest()->getServer('HTTP_REFERER'); ?>')" style="">
+                        <span><span><span>Back</span></span></span>
+                    </button>   
+                </p>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<?php
+$event = $this->getCurrentEvent();
+?>
+
+<div class="entry-edit">
+    <div class="entry-edit">
+	<?php if($data['action'] == '1' || $data['action'] == '2' || $data['action'] == '10'){ ?>
+        <div class="entry-edit-head">
+        <?php if($data['level'] == '1') {?>
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('Success Message'); ?></h4>
+        <?php } else { ?>
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('Error Reports'); ?></h4>
+        <?php } ?>
+        </div>
+				
+        <div id="log_details_fieldset" class="log-details">
+            <?php
+			if($data['response_xml'] == '' && $data['action'] == '10') {
+			$return->html = $data['request_xml'];
+            echo ($return->html);  
+			}
+            else if($data['request_xml'] == '') {
+            $return->html = $data['response_xml'];
+            echo ($return->html);  
+            } else { 
+            $xmlObjRes = simplexml_load_string($data['response_xml']);
+            if ($xmlObjRes->getName() == 'error') {
+
+                $errorCode = $xmlObjRes['code'];
+                $return->error = $xmlObjRes['message'];
+                $return->html = '<div>'.$xmlObjRes['message'].'</div>';
+                echo ($return->html);
+                
+            } else if ($xmlObjRes->getName() == 'feed') {
+
+                if ($xmlObjRes['status'] == 'invalid') {
+                    $return->error = 'Invalid Feed Sent to flubit';
+                    $return->html = '<div> The feed sent to Flubit is Invalid, Please check the request, amend the data where appropriate and send again. </div>';
+                    echo ($return->html);
+                }
+
+                if ($xmlObjRes['status'] == 'processing' || $xmlObjRes['status'] == 'awaiting_validation'  || $xmlObjRes['status'] == 'awaiting_processing') { 
+                    $return->html = '<div> The Feed Id : <b>"' . $data['feedid'] . '"</b> is being processed. Please wait for the response. </div>';
+                    echo ($return->html);
+                }
+                else if ($xmlObjRes['status'] == 'processed') {
+                   
+                            if ($xmlObjRes->results->errors->total > 0) {
+
+                                $return->failedCount = $xmlObjRes->results->errors->total;
+                                $innerTable = '';
+                                $productAlreadyExist = array();
+                                foreach ($xmlObjRes->results->errors->sample->error as $error) {
+                                    $productName = '';
+                                    try {
+                                        $productNameObj = Mage::getModel('catalog/product')->loadByAttribute('sku', $error['sku']);
+                                        if (is_object($productNameObj))
+                                            $productName = $productNameObj->getName();
+                                        else {
+                                           
+                                        }
+                                    } catch (Exception $e) {
+                                        Mage::log('Unable to get name of product Get Feed Errors ' . $e, null, Chetu_Flubit_Helper_Data::FLUBIT_EXCEPTIONS);
+                                    }
+                                    if ($error != '') {
+                                        $return->sku[] = $error['sku'];
+                                        $innerTable .= '<tr>
+                                        <td style="padding:4px;">' . $productName . '</td>
+                                        <td style="padding:4px;">' . $error['sku'] . ' </td>
+                                        <td style="padding:4px;"> ' . $error . ' </td>
+                                    </tr>';
+                                    }
+                                }
+                                if ($innerTable != '')
+                                $return->html = '<div style="color:red;">Following product(s) has failed to sync.</div><br/>
+                                <style type="text/css">
+                                #tableOuter{
+                                        border-style: solid;
+                                        border-width: 1px;
+                                        border-collapse: collapse;
+                                        margin: 0;
+                                        padding:4;
+										color:red;
+                                        width:100%;
+                                    } 
+
+                                    #tableOuter th,#tableOuter td{
+                                        border-style: solid;
+                                        border-width: 0 1px 1px 0;
+                                        border-collapse: collapse;
+										color:red;
+                                        margin: 0;
+                                        padding:4;
+                                    } 
+                                </style>
+                                        <table id="tableOuter" cellspacing="0" cellpadding="0">
+                                        <tr>
+                                            <th width="250" style="color:red; text-weight:bold;">Product Name</th>
+                                            <th width="250" style="color:red; text-weight:bold;">Product SKU</th>
+                                            <th width="250" style="color:red; text-weight:bold;">Error Message</th>
+                                        </tr>
+                                        ' . $innerTable . '
+                                        </table>';
+
+                                echo ($return->html);
+                        }
+						else { 
+                         $return->html = '<div> The Feed Id  <b>"' . $data['feedid'] . '"</b> has been successfully updated. </div>';
+                         echo ($return->html);
+                        //Mage::log('Not Inside created block: ' . ' Feed Id = ' . $xmlObj   , null, 'temptest.log' ); 
+						}  
+					}
+            }
+            }
+            ?>
+        </div>
+	 
+	<?php }// end checking for create and update 
+	//delete product
+	 else if($data['action'] == '9') { ?>
+	  <div class="entry-edit-head">
+        
+		<h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('Success Message'); ?></h4>
+		</div>
+		<div id="log_details_fieldset" class="log-details">
+        <?php
+        $return->html = '<div> The Feed Id  <b>"' . $data['feedid'] . '"</b> has been successfully deleted. </div>';
+        echo ($return->html);
+		echo '</div>';
+        } 
+		//fetch order
+	  else if($data['action'] == '3') { ?>
+	    <div class="entry-edit-head">
+        
+		<h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('Success Message'); ?></h4>
+		</div>
+		<div id="log_details_fieldset" class="log-details">
+            <?php
+             $return->html = '<div> Orders have been successfully fetched from Flubit. </div>';
+             echo ($return->html);
+             echo '</div>';
+             } 
+		//dispatched order
+	   else if($data['action'] == '4') { ?>
+	    <div class="entry-edit-head">
+        
+		<h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('Success Message'); ?></h4>
+		</div>
+		<div id="log_details_fieldset" class="log-details">
+            <?php
+            $xmlObjRes = simplexml_load_string($data['response_xml']);
+            if ($xmlObjRes->getName() == 'success') {
+            $return->html = '<div> Success : Flubit order has been dispatched successfully. </div>';
+            } else {
+            $return->html = '<div> Error occurred : For detailed information see response text field. </div>';
+            }
+            echo ($return->html);
+            echo '</div>';
+       
+            } 
+		//refunded order
+	  else if($data['action'] == '5') { 
+	  $xmlObjRes = simplexml_load_string($data['response_xml']); ?>
+	    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php if ($xmlObjRes->getName() == 'success') { echo $this->__('Success Message'); } else { echo $this->__('Error Reports'); } ?></h4>
+		</div>
+		<div id="log_details_fieldset" class="log-details">
+           <?php
+			if ($xmlObjRes->getName() == 'success') {
+            $return->html = '<div> Success : Flubit order has been refunded successfully.</div>';
+            } else {
+            $return->html = '<div> Error occurred : You might have refunded the order before shipment status reflected on the Flubit or You have generated credit memo before without shipment. </div>';
+            }
+		
+            echo ($return->html);
+            echo '</div>';
+        } 
+		//cancelled order
+		else if($data['action'] == '6') {
+		$xmlObjRes = simplexml_load_string($data['response_xml']);		
+		?>
+	    <div class="entry-edit-head">
+        
+		<h4 class="icon-head head-edit-form fieldset-legend"><?php if ($xmlObjRes->getName() == 'success') { echo $this->__('Success Message'); } else { echo $this->__('Error Reports'); } ?></h4>
+		</div>
+		<div id="log_details_fieldset" class="log-details">
+           <?php
+            
+            if ($xmlObjRes->getName() == 'success') {
+            $return->html = '<div> Success : Flubit order has been cancelled successfully.</div>';
+            } else {
+            $return->html = '<div> Error occurred : Flubit order has been already cancelled. </div>';
+            }
+		
+            echo ($return->html);
+            echo '</div>';
+        } 
+		
+		//create order in magento
+		else if($data['action'] == '7') { ?>
+	    <div class="entry-edit-head">
+        
+		<h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('Success Message'); ?></h4>
+		</div>
+		<div id="log_details_fieldset" class="log-details">
+        <?php
+        $return->html = '<div>' . $data['response_xml'] . '</div>';
+        echo ($return->html);
+        echo '</div>';
+		} 
+	//Communication logs
+     else if($data['action'] == '8' && $feedid  = '401 error') { ?>
+	  <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('Error Report'); ?></h4>
+		</div>
+		<div id="log_details_fieldset" class="log-details">
+        <?php
+        $return->html = '<div> Please check your Consumer key and Secret as you could not be authenticated. Make sure you enter the correct Consumer key and Secret to Continue. </div>';
+        echo ($return->html);
+		echo '</div>';
+        } ?>
+		</div>
+
+        <div class="entry-edit">
+        <?php if($this->escapeHtml($data['request_xml'])) { ?>
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('Request'); ?></h4>
+        </div>
+      
+        <div id="log_details_fieldset" class="log-details">
+            <textarea readonly style="width:100%; height:300px"><?php if($data['action'] == '1' || $data['action'] == '2' || $data['action'] == '9'){  echo $this->escapeHtml($data['request_xml']); } else { echo $this->stripTags($data['request_xml']); }?></textarea>
+        </div>
+          <?php } ?>  
+		  <?php if($this->escapeHtml($data['response_xml'])) { ?>
+        <div class="entry-edit-head">
+		    <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('Response'); ?></h4>
+        </div>
+        <div id="log_details_fieldset" class="log-details">
+            <textarea readonly style="width:100%; height:300px"><?php if($data['action'] == '7'){  echo $this->stripTags($data['response_xml']); } else if($data['action'] == '1' && $data['request_xml'] == '') { echo $this->stripTags($data['response_xml']); } else { echo $this->escapeHtml($data['response_xml']); }?></textarea>
+        </div>
+		<?php } ?>  
+    </div>
+</div>

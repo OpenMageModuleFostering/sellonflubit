@@ -1,0 +1,6 @@
+<?php $notice = $this->checkScheduledCronExecution(); ?>
+<?php if($notice): ?>
+<div class="notification-global">
+    <strong class="label">
+    Latest Message:</strong> <?php echo $notice ?></div>
+<?php endif; ?>

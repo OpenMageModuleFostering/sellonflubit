@@ -1,0 +1,155 @@
+<script type="text/javascript">
+    /**
+     * 
+     * @param event domloaded
+     * @param function
+     * 
+     */
+    document.observe("dom:loaded", function() {
+        $$('.onenter').each(function(elem) {
+            elem.observe("keypress", function(event) {
+                var fieldId = this.id;
+                var id = fieldId.replace(/^\D+/g, '');
+                if (event.keyCode == Event.KEY_RETURN || event.which == Event.KEY_RETURN) {
+                    document.getElementById('link_' + id).click();
+                }
+            });
+        });
+    });
+    /**
+    * Function to update flubit price
+    * 
+     * @param object button
+     * @param string fieldId
+     * @param string price
+     * @returns void
+     * */
+    function updateFlubitPrice(button, fieldId, price)
+    {
+        if (button.getValue() != price) {
+
+            if (button.getValue() > 0) {
+                var x;
+                var r = confirm("Warning! Are you sure that you want to manually update the Flubit Base Price? This will override the Global Price");
+                if (r == true) {
+                    new Ajax.Request('<?php echo Mage::helper('adminhtml')->getUrl('*/*/updateFlubitPrice') ?>', {
+                        method: 'post',
+                        parameters: {id: fieldId, price: button.getValue()},
+                        onSuccess: function(response) {
+                            var data = response.responseText.evalJSON();
+							if (data.SUCCESS != null) {
+                                alert(data.MESSAGE);
+                                if(data.PRICE != ''){
+                                    button.setValue(data.PRICE);
+                                }
+                            }
+                            if (data.ERROR != null) {
+                                alert(data.MESSAGE);
+                            }
+                        }
+                    });
+                }
+                else {
+                    x = "You pressed Cancel!";
+                }
+            }
+            else {
+                alert('Price cannot be negative');
+                button.setValue(price);
+            }
+        }
+    }
+    /**
+    * function to update flubit flubit price calculation 
+    * 
+     * @param object checkbox
+     * @param string fieldId
+     * @param string price
+     * @returns void     */
+    function updateFlubitPriceCalculation(checkbox, fieldId, price)
+    {
+        if (checkbox.checked == true) {
+            var x;
+            var r = confirm("Warning! Are you sure that you want to use global price calculator for the selected product? This will override the Manual Price");
+
+            if (r == true) {
+
+                new Ajax.Request('<?php echo Mage::helper('adminhtml')->getUrl('*/*/updateFlubitPriceCalculator') ?>', {
+                    method: 'post',
+                    parameters: {'id': fieldId, 'status': 1},
+                    onSuccess: function(response) {
+                        var data = response.responseText.evalJSON();
+                        if (data.SUCCESS != null) {
+                            alert(data.MESSAGE);
+                            checkbox.checked = true;
+							$('price_' + data.ID).setValue(data.PRICE);
+                        }
+                        if (data.ERROR != null) {
+                            alert(data.MESSAGE);
+                            checkbox.checked = false;
+                        }
+                    }
+                });
+            }
+            else {
+                x = "You pressed Cancel!";
+                checkbox.checked = false;
+            }
+        }
+        else if (checkbox.checked == false) {
+            var x;
+            var r = confirm("Warning! Are you sure that you want to use manual price for the selected product? This will override the Global Price value");
+
+            if (r == true) {
+
+                new Ajax.Request('<?php echo Mage::helper('adminhtml')->getUrl('*/*/updateFlubitPriceCalculator') ?>', {
+                    method: 'post',
+                    parameters: {'id': fieldId, 'status': 0},
+                    onSuccess: function(response) {
+                        var data = response.responseText.evalJSON();
+                        if (data.SUCCESS != null) {
+                            alert(data.MESSAGE);
+                            checkbox.checked = false;
+                        }
+                        if (data.ERROR != null) {
+                            alert(data.MESSAGE);
+                            checkbox.checked = true;
+                        }
+                    }
+                });
+            }
+            else {
+                x = "You pressed Cancel!";
+                checkbox.checked = true;
+            }
+        }
+        else {
+        }
+
+
+    }
+    /**
+    * function to initiate price and global calculator
+
+     * @param string id
+     * @param string price
+     * @param bool global_stat
+     * @returns void     */
+    function updatePriceAndGlobalCalculator(id, price, global_stat) {
+		
+        var priceBox = $('price_' + id).getValue();
+        var CheckBoxStat = $('checkbox_' + id).checked;
+
+        if (priceBox != price) {
+            if (CheckBoxStat == 1) {
+                alert('Uncheck “Use Global Price” Check box before updating Flubit Price for this product');
+				document.getElementById('price_' + id).value = price;
+			} else {
+                var button = document.getElementById('price_' + id);
+                updateFlubitPrice(button, id, price);
+            }
+        } else {
+            alert('No Change In Flubit Price Field');
+        }
+    }
+</script>

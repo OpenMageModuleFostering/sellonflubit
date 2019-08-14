@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<!-- 
+/**
+* @category   Flubit
+* @package    Flubit_Flubitlog
+* @author     ModuleCreator
+* @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+*/
+-->
+<config>
+    <modules>
+        <Flubit_Flubitlog>
+            <version>0.2.2</version>
+        </Flubit_Flubitlog>
+    </modules>
+    <frontend>
+        <routers>
+            <flubitlog>
+                <use>standard</use>
+                <args>
+                    <module>Flubit_Flubitlog</module>
+                    <frontName>flubitlog</frontName>
+                </args>
+            </flubitlog>
+        </routers>
+        <layout>
+            <updates>
+                <flubitlog>
+                    <file>flubitlog.xml</file>
+                </flubitlog>
+            </updates>
+        </layout>
+    </frontend>
+    <admin>
+        <routers>
+            <flubitlog>
+                <use>admin</use>
+                <args>
+                    <module>Flubit_Flubitlog</module>
+                    <frontName>flubitlog</frontName>
+                </args>
+            </flubitlog>
+        </routers>
+    </admin>
+    <adminhtml>
+        <menu>
+            <flubitlog module="flubitlog">
+                <title>Flubit Logs</title>
+                <sort_order>71</sort_order>               
+                <children>
+                    <items module="flubitlog">
+                        <title>View Logs</title>
+                        <sort_order>0</sort_order>
+                        <action>flubitlog/adminhtml_flubitlog</action>
+                    </items>
+                </children>
+            </flubitlog>
+        </menu>
+        <acl>
+            <resources>
+                <all>
+                    <title>Allow Everything</title>
+                </all>
+                <admin>
+                    <children>
+                        <Flubit_Flubitlog>
+                            <title>Flubitlog Module</title>
+                            <sort_order>10</sort_order>
+                        </Flubit_Flubitlog>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+        <layout>
+            <updates>
+                <flubitlog>
+                    <file>flubitlog.xml</file>
+                </flubitlog>
+            </updates>
+        </layout>
+    </adminhtml>   
+    <global>
+        <models>
+            <flubitlog>
+                <class>Flubit_Flubitlog_Model</class>
+                <resourceModel>flubitlog_mysql4</resourceModel>
+            </flubitlog>
+            <flubitlog_mysql4>
+                <class>Flubit_Flubitlog_Model_Mysql4</class>
+                <entities>
+                    <flubitlog>
+                        <table>flubitlog</table>
+                    </flubitlog>
+                </entities>
+            </flubitlog_mysql4>
+        </models>
+        <resources>
+            <flubitlog_setup>
+                <setup>
+                    <module>Flubit_Flubitlog</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </flubitlog_setup>
+            <flubitlog_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </flubitlog_write>
+            <flubitlog_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </flubitlog_read>
+        </resources>
+        <blocks>
+            <flubitlog>
+                <class>Flubit_Flubitlog_Block</class>
+            </flubitlog>
+        </blocks>
+        <helpers>
+            <flubitlog>
+                <class>Flubit_Flubitlog_Helper</class>
+            </flubitlog>
+        </helpers>
+    </global>
+</config>

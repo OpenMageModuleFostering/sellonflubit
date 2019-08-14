@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <remove name="left" />
+    <flubitlog_adminhtml_flubitlog_index>
+        <reference name="content">
+            <block type="flubitlog/adminhtml_flubitlog" name="flubitlog" />
+        </reference>
+    </flubitlog_adminhtml_flubitlog_index>
+    <flubitlog_adminhtml_flubitlog_detail>
+        <reference name="content">
+            <block type="flubitlog/adminhtml_flubitlog_detail" name="flubitlog_detail" template="flubitlog/logdetails.phtml" />
+        </reference>
+    </flubitlog_adminhtml_flubitlog_detail>
+</layout>
