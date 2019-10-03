@@ -1,16 +1,19 @@
 {
-    "name": "OpenMageModuleFostering/sellonflubit",
+    "name": "OpenMageModuleFostering\/sellonflubit",
     "type": "magento-module",
     "license": "GPL",
     "homepage": "",
     "description": "Sell on Flubit extension enables merchants to integrate with WeFlubit API to sell on all Flubit Channels",
     "authors": [
-    {
-        "name": "weflubit",
-        "email": "we@flubit.com"
-    }
-],
+        {
+            "name": "weflubit",
+            "email": "we@flubit.com"
+        }
+    ],
     "suggest": {
-        "magento-hackathon/magento-composer-installer": "*"
-    }
+        "magento-hackathon\/magento-composer-installer": "*"
+    },
+    "keywords": [
+        "openmage-module"
+    ]
 }
